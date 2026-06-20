@@ -26,7 +26,9 @@ REPO_USER = "pedroobarbosaa"
 REPO_NAME = "relatorios-clemon-desktop"
 BRANCH    = "main"
 
-RAW_VERSION_URL = f"https://raw.githubusercontent.com/{REPO_USER}/{REPO_NAME}/{BRANCH}/app/VERSION"
+# API de conteudo do GitHub: reflete a versao na hora (o raw.githubusercontent
+# tem cache de CDN de varios minutos, o que atrasaria a chegada das atualizacoes).
+API_VERSION_URL = f"https://api.github.com/repos/{REPO_USER}/{REPO_NAME}/contents/app/VERSION?ref={BRANCH}"
 ZIP_URL         = f"https://github.com/{REPO_USER}/{REPO_NAME}/archive/refs/heads/{BRANCH}.zip"
 
 BASE    = Path(__file__).resolve().parent
@@ -51,8 +53,11 @@ def _como_tupla(v: str) -> tuple:
         return (0,)
 
 
-def _baixar(url: str, timeout: int) -> bytes:
-    req = urllib.request.Request(url, headers={"User-Agent": "ClemonApp"})
+def _baixar(url: str, timeout: int, headers: dict | None = None) -> bytes:
+    h = {"User-Agent": "ClemonApp"}
+    if headers:
+        h.update(headers)
+    req = urllib.request.Request(url, headers=h)
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return r.read()
 
@@ -61,7 +66,10 @@ def verificar_atualizacao() -> None:
     """Baixa a versao remota; se for mais nova, substitui a pasta app/."""
     try:
         _log("Verificando atualizacoes...")
-        remota = _baixar(RAW_VERSION_URL, timeout=10).decode("utf-8").strip()
+        remota = _baixar(
+            API_VERSION_URL, timeout=10,
+            headers={"Accept": "application/vnd.github.raw"},
+        ).decode("utf-8").strip()
     except Exception as e:
         _log(f"Sem conexao para atualizar ({e}). Usando a versao instalada.")
         return
