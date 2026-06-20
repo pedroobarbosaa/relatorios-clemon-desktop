@@ -1,0 +1,6 @@
+=== Relatorio Processual - Clemon Campos ===
+Verificando atualizacoes...
+Sem conexao para atualizar (HTTP Error 404: Not Found). Usando a versao instalada.
+Iniciando o sistema...
+2026-06-20 16:12:01.215 Uvicorn server started on 0.0.0.0:8501
+Abrindo o navegador em http://localhost:8501

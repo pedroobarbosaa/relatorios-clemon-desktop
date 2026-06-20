@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+_update_tmp/
+_app_old/
+build/
+dist/
+*.log
+installer/
